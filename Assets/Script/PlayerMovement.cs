@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(AudioSource))]
 public class PlayerMovement : MonoBehaviour
 {
     public enum Facing { Down, Up, Left, Right }
@@ -14,66 +13,79 @@ public class PlayerMovement : MonoBehaviour
     [Header("Renderer")]
     public SpriteRenderer bodyRenderer;
 
-    [Header("Idle Breath (2 frames each)")]
-    public Sprite[] idleRightBreath = new Sprite[2]; // 左用镜像
-    public Sprite[] idleUpBreath = new Sprite[2];
-    public Sprite[] idleDownBreath = new Sprite[2];
-    public float idleBreathFps = 2f; // 呼吸速度（2帧来回切）
+    [Header("Idle (Single Sprite)")]
+    public Sprite idleSprite;
+    public float idleDelay = 0.15f;
 
-    [Header("Walk Frames")]
-    public Sprite[] walkRight;   // 你做的“右走”
-    public Sprite[] walkUp;      // 上走
-    public Sprite[] walkDown;    // 下走
+    [Header("Walk Frames (Directional)")]
+    public Sprite[] walkRight; // right is original, left uses flipX
+    public Sprite[] walkUp;
+    public Sprite[] walkDown;
     public float walkFps = 12f;
+
+    [Header("Audio Sources")]
+    public AudioSource moveSource; // loop for footsteps
+    public AudioSource sfxSource;  // one-shot SFX
 
     [Header("Move Sound")]
     public AudioClip moveLoopClip;
     [Range(0f, 1f)] public float moveVolume = 0.7f;
 
-    [Header("Action Visuals - Pee (J)")]
+    [Header("Action Sound Clips")]
+    public AudioClip peeClip;
+    public AudioClip fartClip;
+    public AudioClip danceClip;
+    [Range(0f, 1f)] public float actionSfxVolume = 1.0f;
+
+    [Header("Pee (J) Visuals")]
     public Sprite[] peeFrames;
     public float peeFps = 10f;
-    public float peeLockSeconds = 0.8f; // 尿尿时锁定移动时间（可调）
-    public GameObject peePrefab;        // 生成在地上的“尿”预制体
-    public Transform peeSpawnPoint;     // 不填则用玩家脚底位置
+    public float peeLockSeconds = 0.8f;
+    public GameObject peePrefab;
+    public Transform peeSpawnPoint;                 // ✅ will mirror with facing
+    public Vector3 peeFallbackWorldOffset = new Vector3(0f, -0.15f, 0f);
 
-    [Header("Action Visuals - Dance (L)")]
-    public Sprite[] danceFrames;
-    public float danceFps = 12f;
-
-    [Header("Action Visuals - Fart (K)")]
-    public SpriteRenderer fartRenderer; // 建议做成玩家child，默认关闭
+    [Header("Fart (K) Visuals")]
+    public SpriteRenderer fartRenderer;            // child renderer, placed for RIGHT
     public Sprite[] fartFrames;
     public float fartFps = 12f;
     public float fartShowSeconds = 0.6f;
-    public Vector2 fartOffsetRight = new Vector2(0.25f, -0.15f);
-    public Vector2 fartOffsetLeft = new Vector2(-0.25f, -0.15f);
 
-    // runtime
+    [Header("Dance (L) Visuals")]
+    public Sprite[] danceFrames;
+    public float danceFps = 12f;
+    public bool lockMovementWhileDancing = true;
+
+    // ========= runtime =========
     private Rigidbody2D rb;
-    private AudioSource audioSource;
-
     private Vector2 input;
     private bool isMoving;
 
-    private Facing facing = Facing.Down;
     private Facing lastFacing = Facing.Down;
 
-    // animation timers
+    // body anim timers
     private float animTimer;
     private int animIndex;
 
-    // action override state
+    // idle delay
+    private float idleTimer;
+
+    // pee override
     private bool isPeeing;
     private float peeLockTimer;
 
+    // dance override
     private bool isDancing;
 
-    // fart state (overlay)
+    // fart overlay
     private bool fartPlaying;
     private float fartTimer;
     private float fartFrameTimer;
     private int fartFrameIndex;
+
+    // mirror bases (local positions)
+    private Vector3 peeSpawnLocalBase;
+    private Vector3 fartLocalBase;
 
     public bool IsMoving => isMoving;
     public Facing CurrentFacing => lastFacing;
@@ -81,77 +93,110 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        audioSource = GetComponent<AudioSource>();
-
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
-
-        audioSource.playOnAwake = false;
-        audioSource.loop = true;
-        audioSource.volume = moveVolume;
-        audioSource.clip = moveLoopClip;
 
         if (bodyRenderer == null)
             bodyRenderer = GetComponentInChildren<SpriteRenderer>();
 
+        // AudioSource auto setup
+        if (moveSource == null)
+        {
+            moveSource = GetComponent<AudioSource>();
+            if (moveSource == null) moveSource = gameObject.AddComponent<AudioSource>();
+        }
+        if (sfxSource == null)
+        {
+            sfxSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        moveSource.playOnAwake = false;
+        moveSource.loop = true;
+        moveSource.volume = moveVolume;
+        moveSource.clip = moveLoopClip;
+
+        sfxSource.playOnAwake = false;
+        sfxSource.loop = false;
+        sfxSource.volume = actionSfxVolume;
+
         if (fartRenderer != null)
             fartRenderer.gameObject.SetActive(false);
 
-        ApplyFacingFlip(lastFacing);
-        SetBodySprite(GetIdleBreathFrames(lastFacing), 0);
+        // cache base local positions for mirroring (avoid drift)
+        if (peeSpawnPoint != null)
+            peeSpawnLocalBase = peeSpawnPoint.localPosition;
+
+        if (fartRenderer != null)
+            fartLocalBase = fartRenderer.transform.localPosition;
+
+        ApplyFacingFlipAndMirror(lastFacing);
+
+        // initial idle
+        if (idleSprite != null && bodyRenderer != null)
+            bodyRenderer.sprite = idleSprite;
     }
 
     void Update()
     {
-        // 1) pee lock (if peeing, movement is locked for a short time)
+        // pee timer
         if (isPeeing)
         {
             peeLockTimer -= Time.deltaTime;
             if (peeLockTimer <= 0f)
             {
                 isPeeing = false;
-                // 回到正常动画（idle/walk）
                 animTimer = 0f;
                 animIndex = 0;
             }
         }
 
-        // 2) read movement input (if peeing, ignore input)
         ReadKeyboardMoveInput();
 
         isMoving = input.sqrMagnitude > 0.0001f;
 
-        if (!isPeeing && !isDancing)
+        // update facing only when we are allowed to move
+        if (!isPeeing && !(lockMovementWhileDancing && isDancing))
         {
             if (isMoving)
-            {
-                facing = GetFacingFromInput(input);
-                lastFacing = facing;
-            }
+                lastFacing = GetFacingFromInput(input);
         }
 
-        ApplyFacingFlip(lastFacing);
-
-        // 3) movement sound
+        ApplyFacingFlipAndMirror(lastFacing);
         HandleMoveSound();
 
-        // 4) body animation (priority: Pee > Dance > Walk/Idle)
+        // body animation priority: Pee > Dance > Walk > Idle(after delay)
         if (isPeeing)
+        {
             PlayBodyFrames(peeFrames, peeFps);
+        }
         else if (isDancing)
+        {
             PlayBodyFrames(danceFrames, danceFps);
+        }
         else if (isMoving)
+        {
+            idleTimer = 0f;
             PlayWalkByFacing(lastFacing);
+        }
         else
-            PlayIdleBreathByFacing(lastFacing);
+        {
+            idleTimer += Time.deltaTime;
+            if (idleTimer >= idleDelay)
+                ShowIdle();
+        }
 
-        // 5) fart overlay animation
         UpdateFartOverlay();
     }
 
     void FixedUpdate()
     {
         if (isPeeing)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
+        if (lockMovementWhileDancing && isDancing)
         {
             rb.linearVelocity = Vector2.zero;
             return;
@@ -168,6 +213,12 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        if (lockMovementWhileDancing && isDancing)
+        {
+            input = Vector2.zero;
+            return;
+        }
+
         var k = Keyboard.current;
         if (k == null)
         {
@@ -175,9 +226,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        float x = 0f;
-        float y = 0f;
-
+        float x = 0f, y = 0f;
         if (k.aKey.isPressed || k.leftArrowKey.isPressed) x -= 1f;
         if (k.dKey.isPressed || k.rightArrowKey.isPressed) x += 1f;
         if (k.sKey.isPressed || k.downArrowKey.isPressed) y -= 1f;
@@ -193,16 +242,15 @@ public class PlayerMovement : MonoBehaviour
     {
         if (moveLoopClip == null) return;
 
-        // 尿尿/跳舞的时候不播放走路声
-        bool shouldPlay = isMoving && !isPeeing && !isDancing;
+        bool shouldPlay = isMoving && !isPeeing && !(lockMovementWhileDancing && isDancing);
 
         if (shouldPlay)
         {
-            if (!audioSource.isPlaying) audioSource.Play();
+            if (!moveSource.isPlaying) moveSource.Play();
         }
         else
         {
-            if (audioSource.isPlaying) audioSource.Stop();
+            if (moveSource.isPlaying) moveSource.Stop();
         }
     }
 
@@ -214,45 +262,54 @@ public class PlayerMovement : MonoBehaviour
             return v.y >= 0 ? Facing.Up : Facing.Down;
     }
 
-    private void ApplyFacingFlip(Facing f)
+    /// <summary>
+    /// Mirror: body flipX + peeSpawnPoint local mirror + fartRenderer local mirror
+    /// </summary>
+    private void ApplyFacingFlipAndMirror(Facing f)
     {
         if (bodyRenderer == null) return;
 
-        // 你现在“右走”是原版，左走要镜像
-        if (f == Facing.Left) bodyRenderer.flipX = true;
-        else bodyRenderer.flipX = false;
+        bool left = (f == Facing.Left);
 
-        // fart 的位置也要跟随镜像（我们在 PlayFartVisual() 里处理位置）
+        // Body: right is original, left mirrored
+        bodyRenderer.flipX = left;
+
+        // Pee spawn point mirror (local)
+        if (peeSpawnPoint != null)
+        {
+            Vector3 p = peeSpawnLocalBase;
+            p.x = left ? -Mathf.Abs(p.x) : Mathf.Abs(p.x);
+            peeSpawnPoint.localPosition = p;
+        }
+
+        // Fart VFX mirror (local)
+        if (fartRenderer != null)
+        {
+            Vector3 fp = fartLocalBase;
+            fp.x = left ? -Mathf.Abs(fp.x) : Mathf.Abs(fp.x);
+            fartRenderer.transform.localPosition = fp;
+            fartRenderer.flipX = left;
+        }
     }
 
     private void PlayWalkByFacing(Facing f)
     {
         Sprite[] frames;
-        float fps = walkFps;
 
         if (f == Facing.Right || f == Facing.Left)
-            frames = walkRight; // 左用 flipX 镜像
+            frames = walkRight; // left uses flipX
         else if (f == Facing.Up)
             frames = walkUp;
         else
             frames = walkDown;
 
-        PlayBodyFrames(frames, fps);
+        PlayBodyFrames(frames, walkFps);
     }
 
-    private void PlayIdleBreathByFacing(Facing f)
+    private void ShowIdle()
     {
-        Sprite[] frames = GetIdleBreathFrames(f);
-        PlayBodyFrames(frames, idleBreathFps);
-    }
-
-    private Sprite[] GetIdleBreathFrames(Facing f)
-    {
-        if (f == Facing.Right || f == Facing.Left)
-            return idleRightBreath; // 左用 flipX
-        if (f == Facing.Up)
-            return idleUpBreath;
-        return idleDownBreath;
+        if (bodyRenderer == null || idleSprite == null) return;
+        bodyRenderer.sprite = idleSprite;
     }
 
     private void PlayBodyFrames(Sprite[] frames, float fps)
@@ -260,10 +317,9 @@ public class PlayerMovement : MonoBehaviour
         if (bodyRenderer == null) return;
         if (frames == null || frames.Length == 0) return;
 
-        // 只有1张就直接显示
         if (frames.Length == 1 || fps <= 0.01f)
         {
-            SetBodySprite(frames, 0);
+            bodyRenderer.sprite = frames[0];
             return;
         }
 
@@ -274,69 +330,49 @@ public class PlayerMovement : MonoBehaviour
         {
             animTimer -= dt;
             animIndex = (animIndex + 1) % frames.Length;
-            SetBodySprite(frames, animIndex);
+            if (frames[animIndex] != null)
+                bodyRenderer.sprite = frames[animIndex];
         }
     }
 
-    private void SetBodySprite(Sprite[] frames, int index)
+    private void PlayOneShot(AudioClip clip)
     {
-        if (bodyRenderer == null) return;
-        if (frames == null || frames.Length == 0) return;
-
-        index = Mathf.Clamp(index, 0, frames.Length - 1);
-        if (frames[index] != null)
-            bodyRenderer.sprite = frames[index];
+        if (clip == null || sfxSource == null) return;
+        sfxSource.PlayOneShot(clip, actionSfxVolume);
     }
 
-    // =========================
-    // Public visual triggers (called by your gameplay/action scripts)
-    // =========================
+    // =========================================================
+    // PUBLIC: call these when your gameplay logic says success
+    // =========================================================
 
-    /// <summary>Call when J pee action succeeds (and you want visuals + pee decal).</summary>
-    public void PlayPeeVisual()
+    /// <summary>J pee success: anim + lock + spawn pee decal + sound</summary>
+    public void PlayPeeFeedback()
     {
-        if (peeFrames == null || peeFrames.Length == 0) return;
+        PlayOneShot(peeClip);
 
-        isPeeing = true;
-        peeLockTimer = Mathf.Max(0.1f, peeLockSeconds);
+        if (peeFrames != null && peeFrames.Length > 0)
+        {
+            isPeeing = true;
+            peeLockTimer = Mathf.Max(0.1f, peeLockSeconds);
+            animTimer = 0f;
+            animIndex = 0;
+        }
 
-        // reset anim to start
-        animTimer = 0f;
-        animIndex = 0;
-
-        // spawn pee decal on floor (every time, leave it there)
         if (peePrefab != null)
         {
-            Vector3 pos;
-            if (peeSpawnPoint != null) pos = peeSpawnPoint.position;
-            else pos = transform.position + new Vector3(0f, -0.15f, 0f);
+            Vector3 pos = (peeSpawnPoint != null)
+                ? peeSpawnPoint.position
+                : transform.position + peeFallbackWorldOffset;
 
             Instantiate(peePrefab, pos, Quaternion.identity);
         }
     }
 
-    /// <summary>Call while holding L (true) / releasing L (false).</summary>
-    public void SetDanceVisualActive(bool active)
+    /// <summary>K fart success: overlay anim + sound</summary>
+    public void PlayFartFeedback()
     {
-        if (active)
-        {
-            if (danceFrames == null || danceFrames.Length == 0) return;
-            isDancing = true;
-            animTimer = 0f;
-            animIndex = 0;
-        }
-        else
-        {
-            if (!isDancing) return;
-            isDancing = false;
-            animTimer = 0f;
-            animIndex = 0;
-        }
-    }
+        PlayOneShot(fartClip);
 
-    /// <summary>Call when K fart action succeeds. Plays a fart overlay near butt.</summary>
-    public void PlayFartVisual()
-    {
         if (fartRenderer == null) return;
         if (fartFrames == null || fartFrames.Length == 0) return;
 
@@ -347,13 +383,30 @@ public class PlayerMovement : MonoBehaviour
 
         fartRenderer.gameObject.SetActive(true);
         fartRenderer.sprite = fartFrames[0];
+    }
 
-        // position fart relative to facing (right vs left)
-        Vector2 offset = (lastFacing == Facing.Left) ? fartOffsetLeft : fartOffsetRight;
-        fartRenderer.transform.localPosition = offset;
+    /// <summary>L dance on/off (for PlayerKeyActions call). Name matches your error.</summary>
+    public void SetDanceFeedbackActive(bool active)
+    {
+        if (active)
+        {
+            if (danceFrames == null || danceFrames.Length == 0) return;
 
-        // mirror fart if needed (optional): usually keep same, but you can match flipX
-        fartRenderer.flipX = (lastFacing == Facing.Left);
+            if (!isDancing)
+            {
+                isDancing = true;
+                animTimer = 0f;
+                animIndex = 0;
+                PlayOneShot(danceClip);
+            }
+        }
+        else
+        {
+            if (!isDancing) return;
+            isDancing = false;
+            animTimer = 0f;
+            animIndex = 0;
+        }
     }
 
     private void UpdateFartOverlay()
@@ -368,7 +421,6 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // animate fart frames
         fartFrameTimer += Time.deltaTime;
         float dt = 1f / Mathf.Max(1f, fartFps);
 

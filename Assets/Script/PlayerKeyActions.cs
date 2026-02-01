@@ -7,18 +7,19 @@ public class PlayerKeyActions : MonoBehaviour
     public ActionExecutor executor;
     public VisibilityProbe2D playerProbe;
     public GoodHintUI goodHintUI;
-    public PlayerMovement movementVisual;   // ✅ 用来播 J/K/L 动画
+    public PlayerMovement playerMovement;
 
     [Header("Dance (L)")]
     public float danceHoldSeconds = 1.0f;
-    private bool dancing;
+
+    private bool lHeld;
     private float danceTimer;
     private bool danceRewardGiven;
 
     void Awake()
     {
         if (playerProbe == null) playerProbe = GetComponent<VisibilityProbe2D>();
-        if (movementVisual == null) movementVisual = GetComponent<PlayerMovement>();
+        if (playerMovement == null) playerMovement = GetComponent<PlayerMovement>();
     }
 
     void Update()
@@ -26,58 +27,54 @@ public class PlayerKeyActions : MonoBehaviour
         var k = Keyboard.current;
         if (k == null) return;
 
-        // -------- L: Dance (Good) - hold >= 1s to succeed --------
-        bool lHeld = k.lKey.isPressed;
+        // L dance hold
+        bool nowHeld = k.lKey.isPressed;
+
+        if (nowHeld && !lHeld)
+        {
+            lHeld = true;
+            danceTimer = 0f;
+            danceRewardGiven = false;
+
+            if (playerMovement != null)
+                playerMovement.SetDanceFeedbackActive(true);
+        }
+        else if (!nowHeld && lHeld)
+        {
+            lHeld = false;
+            danceTimer = 0f;
+
+            if (playerMovement != null)
+                playerMovement.SetDanceFeedbackActive(false);
+        }
 
         if (lHeld)
         {
-            if (!dancing)
-            {
-                dancing = true;
-                danceTimer = 0f;
-                danceRewardGiven = false;
-
-                if (movementVisual != null)
-                    movementVisual.SetDanceVisualActive(true);
-            }
-
             danceTimer += Time.deltaTime;
-
             if (!danceRewardGiven && danceTimer >= danceHoldSeconds)
             {
                 danceRewardGiven = true;
-                TryGoodDance(); // 成功/失败判定在 executor 里
-            }
-        }
-        else
-        {
-            if (dancing)
-            {
-                dancing = false;
-                danceTimer = 0f;
-
-                if (movementVisual != null)
-                    movementVisual.SetDanceVisualActive(false);
+                TryGoodDance();
             }
         }
 
-        // -------- K: Fart (BadPublic) --------
+        // K fart
         if (k.kKey.wasPressedThisFrame)
         {
             if (TryFart())
             {
-                if (movementVisual != null)
-                    movementVisual.PlayFartVisual();
+                if (playerMovement != null)
+                    playerMovement.PlayFartFeedback();
             }
         }
 
-        // -------- J: Pee (BadHidden) --------
+        // J pee
         if (k.jKey.wasPressedThisFrame)
         {
             if (TryPee(out bool arrested))
             {
-                if (movementVisual != null)
-                    movementVisual.PlayPeeVisual();
+                if (playerMovement != null)
+                    playerMovement.PlayPeeFeedback();
             }
         }
     }
@@ -99,15 +96,8 @@ public class PlayerKeyActions : MonoBehaviour
             out arrested
         );
 
-        if (!ok)
-        {
-            if (goodHintUI != null)
-                goodHintUI.Show("You need to be in NPC FOV to do this good action.");
-        }
-        else
-        {
-            Debug.Log("[Action] Dance Good Success (-10)");
-        }
+        if (!ok && goodHintUI != null)
+            goodHintUI.Show("You need to be in NPC FOV to do this good action.");
     }
 
     private bool TryFart()
@@ -117,7 +107,7 @@ public class PlayerKeyActions : MonoBehaviour
         bool arrested;
         string reason;
 
-        bool ok = executor.TryExecute(
+        return executor.TryExecute(
             ActionExecutor.ActionType.BadPublic,
             playerProbe,
             targetProbe: null,
@@ -126,9 +116,6 @@ public class PlayerKeyActions : MonoBehaviour
             out reason,
             out arrested
         );
-
-        if (ok) Debug.Log("[Action] Fart Public Bad (+20)");
-        return ok;
     }
 
     private bool TryPee(out bool arrested)
@@ -138,7 +125,7 @@ public class PlayerKeyActions : MonoBehaviour
 
         string reason;
 
-        bool ok = executor.TryExecute(
+        return executor.TryExecute(
             ActionExecutor.ActionType.BadHidden,
             playerProbe,
             targetProbe: null,
@@ -147,8 +134,5 @@ public class PlayerKeyActions : MonoBehaviour
             out reason,
             out arrested
         );
-
-        if (ok) Debug.Log("[Action] Pee Hidden Bad (+10)");
-        return ok;
     }
 }
