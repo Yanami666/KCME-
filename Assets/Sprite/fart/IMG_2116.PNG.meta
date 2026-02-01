@@ -1,13 +1,10 @@
 fileFormatVersion: 2
-guid: 7d80aa3b501154e2ab08af226bf7bdfc
+guid: 5a0222d2f042f4ad295e890bda03f6bd
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6093849966088442461
-    second: IMG_2076_0
-  - first:
-      213: 7639222536518082632
-    second: IMG_2076_1
+      213: -7852682980664708497
+    second: IMG_2116_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -116,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: IMG_2076_0
+      name: IMG_2116_0
       rect:
         serializedVersion: 2
-        x: 650
-        y: 228
-        width: 1228
-        height: 1399
+        x: 249
+        y: 388
+        width: 1566
+        height: 2093
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -131,30 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3ada5c01ebb4e6ba0800000000000000
-      internalID: -6093849966088442461
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IMG_2076_1
-      rect:
-        serializedVersion: 2
-        x: 2097
-        y: 242
-        width: 1196
-        height: 1399
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 840a1513c68f30a60800000000000000
-      internalID: 7639222536518082632
+      spriteID: f6279b33f6aa50390800000000000000
+      internalID: -7852682980664708497
       vertices: []
       indices: 
       edges: []
@@ -163,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 8ad1d33c89ace41d4a81be8775dfe00d
+    spriteID: ee7c486dc5447446584dc7fd822a3dcb
     internalID: 0
     vertices: []
     indices: 
@@ -173,8 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      IMG_2076_0: -6093849966088442461
-      IMG_2076_1: 7639222536518082632
+      IMG_2116_0: -7852682980664708497
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
