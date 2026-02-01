@@ -6,7 +6,7 @@ public class InteractableAction2D : MonoBehaviour
     [Header("Core Refs")]
     public ActionExecutor executor;
     public VisibilityProbe2D playerProbe;
-    public VisibilityProbe2D targetProbe; // optional (attach VisibilityProbe2D to this object if needed)
+    public VisibilityProbe2D targetProbe; // optional
     public GoodHintUI goodHintUI;
 
     [Header("Rule")]
@@ -35,11 +35,14 @@ public class InteractableAction2D : MonoBehaviour
     public UnityEvent onArrested;
 
     [Header("Consume")]
-    public bool disableOnSuccess = false; // if true: disables collider + renderer
+    public bool disableOnSuccess = false; // if true: disables colliders + renderer + this script
 
     private bool inRange;
     private Color baseColor;
     private float blinkT;
+
+    // ✅ 新增：成功后彻底禁止再次触发
+    private bool consumed;
 
     void Awake()
     {
@@ -48,12 +51,8 @@ public class InteractableAction2D : MonoBehaviour
 
         if (sfxSource == null) sfxSource = GetComponent<AudioSource>();
 
-        // Try auto-wire common refs if placed near Player/GameManager (safe, no hard fail)
         if (executor == null)
-        {
-            var gm = FindObjectOfType<ActionExecutor>();
-            executor = gm;
-        }
+            executor = FindObjectOfType<ActionExecutor>();
     }
 
     public void SetInRange(bool v)
@@ -62,7 +61,6 @@ public class InteractableAction2D : MonoBehaviour
 
         if (!inRange)
         {
-            // restore
             if (spriteRenderer != null)
                 spriteRenderer.color = baseColor;
             blinkT = 0f;
@@ -71,6 +69,7 @@ public class InteractableAction2D : MonoBehaviour
 
     void Update()
     {
+        if (consumed) return;           // ✅ 彻底阻止
         if (!inRange) return;
         if (spriteRenderer == null) return;
 
@@ -84,6 +83,7 @@ public class InteractableAction2D : MonoBehaviour
 
     public void TryInteract()
     {
+        if (consumed) return;           // ✅ 彻底阻止
         if (requireInRange && !inRange) return;
         if (executor == null) return;
 
@@ -115,10 +115,18 @@ public class InteractableAction2D : MonoBehaviour
 
             if (disableOnSuccess)
             {
-                var col = GetComponent<Collider2D>();
-                if (col != null) col.enabled = false;
+                consumed = true;   // ✅ 标记消耗，任何后续点击都无效
+                SetInRange(false);
 
+                // ✅ 关键：禁用“自己 + 子物体”的所有 Collider2D（包括 Trigger）
+                var cols = GetComponentsInChildren<Collider2D>(true);
+                for (int i = 0; i < cols.Length; i++)
+                    if (cols[i] != null) cols[i].enabled = false;
+
+                // 关渲染
                 if (spriteRenderer != null) spriteRenderer.enabled = false;
+
+                // 关脚本本体
                 enabled = false;
             }
         }
