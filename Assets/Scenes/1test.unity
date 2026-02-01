@@ -752,7 +752,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &767668848
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -800,7 +800,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: -6958291850070090110, guid: e375c7b916b254d8bac27e074d062ddf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -820,7 +820,7 @@ Transform:
   m_GameObject: {fileID: 767668847}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.11, y: -5.79, z: 0}
+  m_LocalPosition: {x: 7, y: -3.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1708,6 +1708,7 @@ GameObject:
   - component: {fileID: 1425076962}
   - component: {fileID: 1425076965}
   - component: {fileID: 1425076967}
+  - component: {fileID: 1425076968}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1805,12 +1806,23 @@ MonoBehaviour:
   moveSpeed: 6
   normalizeDiagonal: 1
   bodyRenderer: {fileID: 1425076960}
-  idleSprite: {fileID: 0}
+  idleSprite: {fileID: 2242444559987806358, guid: a7bff8dc0a00b4e0b908bd207ba9498c, type: 3}
   idleDelay: 0.15
-  walkRight: []
-  walkUp: []
-  walkDown: []
-  walkFps: 12
+  walkRight:
+  - {fileID: -3322808393660930422, guid: 20c93c3425dc04655a050d97c76a8c27, type: 3}
+  - {fileID: -6344208567754187116, guid: 20c93c3425dc04655a050d97c76a8c27, type: 3}
+  - {fileID: -4652635678131390402, guid: 20c93c3425dc04655a050d97c76a8c27, type: 3}
+  - {fileID: 6257534607680307024, guid: 20c93c3425dc04655a050d97c76a8c27, type: 3}
+  walkUp:
+  - {fileID: -3409446891288736484, guid: 2fedfab51082a45e7a789cc8dc717b9f, type: 3}
+  - {fileID: 3034707005250604234, guid: 2fedfab51082a45e7a789cc8dc717b9f, type: 3}
+  - {fileID: 1656238782553479353, guid: 2fedfab51082a45e7a789cc8dc717b9f, type: 3}
+  walkDown:
+  - {fileID: -3895443039311488606, guid: 242d9aa1bd4bd4c839bc8f652c511dc7, type: 3}
+  - {fileID: -8956225676126705555, guid: 242d9aa1bd4bd4c839bc8f652c511dc7, type: 3}
+  - {fileID: -3708614187920285843, guid: 242d9aa1bd4bd4c839bc8f652c511dc7, type: 3}
+  - {fileID: 532387604178691663, guid: 242d9aa1bd4bd4c839bc8f652c511dc7, type: 3}
+  walkFps: 4
   moveSource: {fileID: 0}
   sfxSource: {fileID: 0}
   moveLoopClip: {fileID: 0}
@@ -1819,17 +1831,23 @@ MonoBehaviour:
   fartClip: {fileID: 0}
   danceClip: {fileID: 0}
   actionSfxVolume: 1
-  peeFrames: []
-  peeFps: 1
+  peeFrames:
+  - {fileID: -5326462689967371132, guid: a448130075e8244188c9025af20c5ec6, type: 3}
+  - {fileID: -1049585436721767350, guid: a448130075e8244188c9025af20c5ec6, type: 3}
+  - {fileID: 8117556258130965371, guid: a448130075e8244188c9025af20c5ec6, type: 3}
+  - {fileID: -4588951853838251387, guid: a448130075e8244188c9025af20c5ec6, type: 3}
+  peeFps: 4
   peeLockSeconds: 0.8
   peePrefab: {fileID: 7996633327970244010, guid: 9fe0a3b6c38934314a844d4c5a7b2f9f, type: 3}
   peeSpawnPoint: {fileID: 789288104}
   peeFallbackWorldOffset: {x: 0, y: 0, z: 0}
   fartRenderer: {fileID: 767668848}
   fartFrames: []
-  fartFps: 12
+  fartFps: 3
   fartShowSeconds: 0.6
-  danceFrames: []
+  danceFrames:
+  - {fileID: -6093849966088442461, guid: 7d80aa3b501154e2ab08af226bf7bdfc, type: 3}
+  - {fileID: 7639222536518082632, guid: 7d80aa3b501154e2ab08af226bf7bdfc, type: 3}
   danceFps: 2
   lockMovementWhileDancing: 1
 --- !u!82 &1425076963
@@ -2636,6 +2654,28 @@ MonoBehaviour:
   goodHintUI: {fileID: 1350026309}
   playerMovement: {fileID: 1425076962}
   danceHoldSeconds: 1
+--- !u!95 &1425076968
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425076959}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b6fe66cb26b766b41a677e301fadd534, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1509609291
 GameObject:
   m_ObjectHideFlags: 0
