@@ -123,8 +123,8 @@ TextureImporter:
         y: 115
         width: 1180
         height: 1837
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -137,33 +137,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: IMG_2045_1
-      rect:
-        serializedVersion: 2
-        x: 1611
-        y: 1591
-        width: 17
-        height: 74
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d8887fa1d75f880f0800000000000000
-      internalID: -1114370990102050675
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: c3c0b27c15fa74286bcec42f43f80564
     internalID: 0
     vertices: []
     indices: 

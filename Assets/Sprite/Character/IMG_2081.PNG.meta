@@ -135,8 +135,8 @@ TextureImporter:
         y: 145
         width: 911
         height: 1490
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -150,28 +150,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: IMG_2081_1
-      rect:
-        serializedVersion: 2
-        x: 1801
-        y: 1534
-        width: 13
-        height: 10
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 275c2ffb6d2fca0e0800000000000000
-      internalID: -2257162309062179470
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: IMG_2081_2
       rect:
         serializedVersion: 2
@@ -179,8 +157,8 @@ TextureImporter:
         y: 159
         width: 902
         height: 1405
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -193,77 +171,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: IMG_2081_3
-      rect:
-        serializedVersion: 2
-        x: 596
-        y: 1520
-        width: 13
-        height: 10
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: ee8e26fd21eae94b0800000000000000
-      internalID: -5431712704481793810
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IMG_2081_4
-      rect:
-        serializedVersion: 2
-        x: 1799
-        y: 1501
-        width: 7
-        height: 10
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: f099e1cee2f24a940800000000000000
-      internalID: 5306418139525716239
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IMG_2081_5
-      rect:
-        serializedVersion: 2
-        x: 594
-        y: 1487
-        width: 7
-        height: 10
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 04518c0d9dbfb3540800000000000000
-      internalID: 4988857925172204864
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 671b349d8819a41708c3a647f41b27a7
     internalID: 0
     vertices: []
     indices: 
@@ -279,6 +191,7 @@ TextureImporter:
       IMG_2081_3: -5431712704481793810
       IMG_2081_4: 5306418139525716239
       IMG_2081_5: 4988857925172204864
+      IMG_2081_6: -410020337
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
