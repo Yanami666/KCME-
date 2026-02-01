@@ -1847,11 +1847,11 @@ MonoBehaviour:
   peeFallbackWorldOffset: {x: 0, y: 0, z: 0}
   peeSpawnDelay: 1
   fartFrames:
-  - {fileID: 2322195753145830120, guid: eacdd03f4cdfd4007bb5d58bad83b520, type: 3}
-  - {fileID: 6490701178025159772, guid: fdd2235d1c286481686aeb7ce27513d4, type: 3}
-  - {fileID: -7852682980664708497, guid: 5a0222d2f042f4ad295e890bda03f6bd, type: 3}
+  - {fileID: -5460574528902692582, guid: 15cbc03adc7074c398a75311cff7b25b, type: 3}
+  - {fileID: 8370743295146710832, guid: 15cbc03adc7074c398a75311cff7b25b, type: 3}
+  - {fileID: 7326897259834069532, guid: 15cbc03adc7074c398a75311cff7b25b, type: 3}
   fartFps: 3
-  fartLockSeconds: 0.35
+  fartLockSeconds: 0.5
   lockMovementWhileFart: 1
   danceFrames:
   - {fileID: -6093849966088442461, guid: 7d80aa3b501154e2ab08af226bf7bdfc, type: 3}
