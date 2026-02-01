@@ -1027,6 +1027,7 @@ GameObject:
   - component: {fileID: 1073808201}
   - component: {fileID: 1073808200}
   - component: {fileID: 1073808202}
+  - component: {fileID: 1073808203}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -1077,6 +1078,20 @@ MonoBehaviour:
   closeButtonImage: {fileID: 1061313894}
   normalSprite: {fileID: -1811936938941063141, guid: 8236c37d39a333f47b8f3f4305ec08b6, type: 3}
   hoverSprite: {fileID: 2272501594797041729, guid: 64e73b3e50ee3b04ca737e19e22f9bda, type: 3}
+--- !u!114 &1073808203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1073808199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e768152e1cc1b3a43ab58014c33223c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalBGM
+  bgmClip: {fileID: 8300000, guid: 02d47c070c1c242509a863de95ad4d09, type: 3}
+  volume: 0.5
 --- !u!1 &1131386434
 GameObject:
   m_ObjectHideFlags: 0
