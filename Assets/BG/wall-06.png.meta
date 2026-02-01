@@ -1,46 +1,10 @@
 fileFormatVersion: 2
-guid: 751cf43b474d84506abd53edce31c4f2
+guid: ed04c41ade46c48938565ca57dddabb9
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5909532002517273652
-    second: IMG_2093_0
-  - first:
-      213: 6227977806933997763
-    second: IMG_2093_1
-  - first:
-      213: -7679461656226021058
-    second: IMG_2093_2
-  - first:
-      213: 7309005325414862357
-    second: IMG_2093_3
-  - first:
-      213: -9034076494520721700
-    second: IMG_2093_4
-  - first:
-      213: 8208346721504332445
-    second: IMG_2093_5
-  - first:
-      213: -8584682812166406128
-    second: IMG_2093_6
-  - first:
-      213: -6653388243644684135
-    second: IMG_2093_7
-  - first:
-      213: -4919502713686543077
-    second: IMG_2093_8
-  - first:
-      213: 4430240219960184522
-    second: IMG_2093_9
-  - first:
-      213: -7649697040587691230
-    second: IMG_2093_10
-  - first:
-      213: -6994729460573362496
-    second: IMG_2093_11
-  - first:
-      213: 3989042337662875251
-    second: IMG_2093_12
+      213: -1198218438493112441
+    second: wall-06_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -149,45 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: IMG_2093_6
+      name: wall-06_0
       rect:
         serializedVersion: 2
-        x: 2113
-        y: 260
-        width: 1318
-        height: 1362
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 0
+        y: 0
+        width: 4001
+        height: 2251
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0108b6747741dd880800000000000000
-      internalID: -8584682812166406128
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IMG_2093_12
-      rect:
-        serializedVersion: 2
-        x: 3695
-        y: 209
-        width: 1362
-        height: 1333
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 376b36a0fdceb5730800000000000000
-      internalID: 3989042337662875251
+      spriteID: 7877b4abda21f5fe0800000000000000
+      internalID: -1198218438493112441
       vertices: []
       indices: 
       edges: []
@@ -196,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: da0409cc6ac2d47fa8c4448108615204
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -206,19 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      IMG_2093_0: -5909532002517273652
-      IMG_2093_1: 6227977806933997763
-      IMG_2093_10: -7649697040587691230
-      IMG_2093_11: -6994729460573362496
-      IMG_2093_12: 3989042337662875251
-      IMG_2093_2: -7679461656226021058
-      IMG_2093_3: 7309005325414862357
-      IMG_2093_4: -9034076494520721700
-      IMG_2093_5: 8208346721504332445
-      IMG_2093_6: -8584682812166406128
-      IMG_2093_7: -6653388243644684135
-      IMG_2093_8: -4919502713686543077
-      IMG_2093_9: 4430240219960184522
+      wall-06_0: -1198218438493112441
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
