@@ -1816,15 +1816,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 513064778}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -17.2, y: -1.8, z: -1.7721312}
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalPosition: {x: 1.4000034, y: 1.1000009, z: -1.7721312}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1900555159}
   - {fileID: 653461498}
   - {fileID: 399666117}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 584712013}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!61 &513064781
 BoxCollider2D:
@@ -1888,17 +1888,18 @@ MonoBehaviour:
   moveSpeed: 6
   minStepDistance: 5
   maxStepDistance: 20
+  arriveDistance: 0.05
   waitSeconds: 15
   headTurnIntervalRange: {x: 5, y: 9}
+  mirrorRoot: {fileID: 584712013}
   spriteRenderer: {fileID: 513064779}
-  originalFacesLeft: 0
-  fovRoot: {fileID: 1900555159}
   idleFrames:
   - {fileID: 970730220261821923, guid: dbf22be5ba56a4df0a0c116ebfc12c7a, type: 3}
   - {fileID: 6949851440254017233, guid: dbf22be5ba56a4df0a0c116ebfc12c7a, type: 3}
   idleFps: 2
   walkFrames: []
   walkFps: 8
+  leftKeepOriginalRightFlip: 1
 --- !u!50 &513064783
 Rigidbody2D:
   serializedVersion: 5
@@ -2671,6 +2672,38 @@ PolygonCollider2D:
       - {x: 0.32999998, y: 1.38}
       - {x: 0.32, y: 1.39}
   m_UseDelaunayMesh: 0
+--- !u!1 &584712012
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 584712013}
+  m_Layer: 0
+  m_Name: NPC_Purple
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &584712013
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 584712012}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -18.6, y: -2.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 513064780}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &650453695
 GameObject:
   m_ObjectHideFlags: 0
@@ -3554,7 +3587,7 @@ GameObject:
   - component: {fileID: 817227016}
   - component: {fileID: 817227014}
   m_Layer: 0
-  m_Name: Square
+  m_Name: NPC_PurpleMove
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3614,7 +3647,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 817227013}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -18.8, y: -3.3, z: 0}
   m_LocalScale: {x: 50, y: 50, z: 50}
   m_ConstrainProportionsScale: 1
@@ -8736,7 +8769,7 @@ SceneRoots:
   - {fileID: 265916748}
   - {fileID: 1830981089}
   - {fileID: 1425076961}
-  - {fileID: 513064780}
+  - {fileID: 584712013}
   - {fileID: 817227016}
   - {fileID: 864107469}
   - {fileID: 1827728270}

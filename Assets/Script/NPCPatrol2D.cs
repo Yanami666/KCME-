@@ -10,18 +10,18 @@ public class NPCPatrol2D : MonoBehaviour
     public float moveSpeed = 1.2f;
     public float minStepDistance = 3f;
     public float maxStepDistance = 7f;
+    public float arriveDistance = 0.05f;
 
     [Header("Wait")]
     public float waitSeconds = 15f;
-    public Vector2 headTurnIntervalRange = new Vector2(2f, 5f);
+    public Vector2 headTurnIntervalRange = new Vector2(6f, 12f); // ✅ slower turns by default
 
-    [Header("Sprite")]
+    [Header("Mirror (IMPORTANT)")]
+    [Tooltip("Put Sprite + FOV + StealZone + any colliders that must flip under this root.")]
+    public Transform mirrorRoot;
+
+    [Header("Sprite (optional: only used if mirrorRoot is null)")]
     public SpriteRenderer spriteRenderer;
-    [Tooltip("If your original sprite faces LEFT, keep this true.")]
-    public bool originalFacesLeft = true;
-
-    [Header("FOV Root (optional)")]
-    public Transform fovRoot; // child object holding the FOV collider
 
     [Header("Idle Animation (during wait)")]
     public Sprite[] idleFrames;
@@ -31,6 +31,10 @@ public class NPCPatrol2D : MonoBehaviour
     public Sprite[] walkFrames;
     public float walkFps = 8f;
 
+    [Header("Facing Rule")]
+    [Tooltip("If true: when moving LEFT keep facingLeft; when moving RIGHT faceRight (mirror).")]
+    public bool leftKeepOriginalRightFlip = true;
+
     private Rigidbody2D rb;
 
     private enum State { Moving, Waiting }
@@ -39,27 +43,30 @@ public class NPCPatrol2D : MonoBehaviour
     private Vector2 targetPos;
     private float waitTimer;
 
-    // anim
+    // animation
     private float animTimer;
     private int animIndex;
 
     // head turn
     private float headTurnTimer;
-    private bool facingRight; // true = facing right (means flipX for original-left sprite)
+    private bool facingRight; // true = right, false = left
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
+        rb.freezeRotation = true;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
         if (spriteRenderer == null)
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
+        // start facing left (original)
+        SetFacingRight(false);
+
         PickNextTarget();
         state = State.Moving;
         ScheduleHeadTurn();
-        ApplyFacing(false); // start facing left by default
     }
 
     void Update()
@@ -68,14 +75,14 @@ public class NPCPatrol2D : MonoBehaviour
         {
             waitTimer -= Time.deltaTime;
 
-            // idle anim
+            // idle animation
             PlayFrames(idleFrames, idleFps);
 
-            // head turn occasionally
+            // head turn occasionally while waiting
             headTurnTimer -= Time.deltaTime;
             if (headTurnTimer <= 0f)
             {
-                ApplyFacing(!facingRight);
+                SetFacingRight(!facingRight);
                 ScheduleHeadTurn();
             }
 
@@ -83,13 +90,12 @@ public class NPCPatrol2D : MonoBehaviour
             {
                 PickNextTarget();
                 state = State.Moving;
-                animTimer = 0f;
-                animIndex = 0;
+                ResetAnim();
             }
         }
         else
         {
-            // moving anim
+            // moving animation (optional)
             if (walkFrames != null && walkFrames.Length > 0)
                 PlayFrames(walkFrames, walkFps);
         }
@@ -104,28 +110,44 @@ public class NPCPatrol2D : MonoBehaviour
         rb.MovePosition(next);
 
         Vector2 delta = targetPos - pos;
+
+        // apply facing based on horizontal movement direction
         if (Mathf.Abs(delta.x) > 0.01f)
         {
-            // left: keep original, right: flip (per your rule)
-            if (delta.x > 0f) ApplyFacing(true);
-            else ApplyFacing(false);
+            if (leftKeepOriginalRightFlip)
+            {
+                // left: keep original, right: flip
+                if (delta.x > 0f) SetFacingRight(true);
+                else SetFacingRight(false);
+            }
+            else
+            {
+                // alternative rule: face direction of travel (left/right)
+                SetFacingRight(delta.x > 0f);
+            }
         }
 
-        if (Vector2.Distance(next, targetPos) <= 0.05f)
+        if (Vector2.Distance(next, targetPos) <= arriveDistance)
         {
             state = State.Waiting;
             waitTimer = waitSeconds;
-            animTimer = 0f;
-            animIndex = 0;
+            ResetAnim();
             ScheduleHeadTurn();
         }
     }
+
+    // -----------------------
+    // Core helpers
+    // -----------------------
 
     private void PickNextTarget()
     {
         Vector2 current = rb.position;
 
-        Vector2 randomDir = Random.insideUnitCircle.normalized;
+        Vector2 randomDir = Random.insideUnitCircle;
+        if (randomDir.sqrMagnitude < 0.0001f) randomDir = Vector2.right;
+        randomDir = randomDir.normalized;
+
         float dist = Random.Range(minStepDistance, maxStepDistance);
         Vector2 candidate = current + randomDir * dist;
 
@@ -148,27 +170,10 @@ public class NPCPatrol2D : MonoBehaviour
         headTurnTimer = Random.Range(headTurnIntervalRange.x, headTurnIntervalRange.y);
     }
 
-    private void ApplyFacing(bool right)
+    private void ResetAnim()
     {
-        facingRight = right;
-
-        if (spriteRenderer != null)
-        {
-            // if original faces LEFT:
-            // left -> flipX = false, right -> flipX = true
-            if (originalFacesLeft)
-                spriteRenderer.flipX = facingRight;
-            else
-                spriteRenderer.flipX = !facingRight;
-        }
-
-        // mirror FOV
-        if (fovRoot != null)
-        {
-            Vector3 s = fovRoot.localScale;
-            s.x = Mathf.Abs(s.x) * (facingRight ? -1f : 1f);
-            fovRoot.localScale = s;
-        }
+        animTimer = 0f;
+        animIndex = 0;
     }
 
     private void PlayFrames(Sprite[] frames, float fps)
@@ -191,5 +196,28 @@ public class NPCPatrol2D : MonoBehaviour
             animIndex = (animIndex + 1) % frames.Length;
             spriteRenderer.sprite = frames[animIndex];
         }
+    }
+
+    // -----------------------
+    // Mirror (the whole NPC visuals + colliders)
+    // -----------------------
+
+    private void SetFacingRight(bool right)
+    {
+        facingRight = right;
+
+        // ✅ BEST: flip mirrorRoot scale so colliders + children flip too
+        if (mirrorRoot != null)
+        {
+            Vector3 s = mirrorRoot.localScale;
+            float absX = Mathf.Abs(s.x);
+            s.x = absX * (facingRight ? -1f : 1f);
+            mirrorRoot.localScale = s;
+            return;
+        }
+
+        // fallback (ONLY visual flip; colliders won't flip)
+        if (spriteRenderer != null)
+            spriteRenderer.flipX = facingRight;
     }
 }
