@@ -852,7 +852,7 @@ Transform:
   m_GameObject: {fileID: 789288103}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.7, y: -9.4, z: 0}
+  m_LocalPosition: {x: 6.71, y: -9.4, z: 0}
   m_LocalScale: {x: 0.55, y: 0.55, z: 0.55}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -1081,7 +1081,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7924528, g: 0.15325737, b: 0.15325737, a: 0.392}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.392}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1118,7 +1118,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ffb4389bf9064f50b2ecebff7dd16fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BadnessMeterUI_Segments
-  meter: {fileID: 1830981088}
   segments:
   - {fileID: 1529560892}
   - {fileID: 1592657127}
@@ -1132,8 +1131,8 @@ MonoBehaviour:
   - {fileID: 2018498692}
   - {fileID: 1220114107}
   - {fileID: 121191449}
-  onColor: {r: 0.3584906, g: 0.20799218, b: 0.20799218, a: 1}
-  offColor: {r: 0.7075472, g: 0.69085974, b: 0.69085974, a: 0.2}
+  emptyColor: {r: 1, g: 1, b: 1, a: 0.25}
+  filledColor: {r: 0.4056604, g: 0.19708973, b: 0.19708973, a: 1}
 --- !u!1 &1088071773
 GameObject:
   m_ObjectHideFlags: 0
@@ -2971,7 +2970,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BadnessMeter
   maxValue: 120
   startValue: 20
-  value: 0
+  cellSize: 10
+  ui: {fileID: 978026439}
+  arrestManager: {fileID: 1830981090}
+  arrestWhenFull: 1
+  arrestReason: Badness is full.
 --- !u!4 &1830981089
 Transform:
   m_ObjectHideFlags: 0

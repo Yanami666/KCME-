@@ -3,39 +3,28 @@ using UnityEngine.UI;
 
 public class BadnessMeterUI_Segments : MonoBehaviour
 {
-    [Header("References")]
-    public BadnessMeter meter;
-    public Image[] segments; // 12个Image拖进来
+    [Header("12 segment Images (left -> right)")]
+    public Image[] segments;
 
-    [Header("Visual")]
-    public Color onColor = Color.red;
-    public Color offColor = new Color(1f, 1f, 1f, 0.2f);
+    [Header("Colors")]
+    public Color emptyColor = new Color(1f, 1f, 1f, 0.25f);
+    public Color filledColor = new Color(1f, 0.2f, 0.2f, 1f);
 
-    void Start()
+    /// <summary>
+    /// filled = how many segments are filled (0..12)
+    /// max is kept for compatibility; we use segments.Length as truth.
+    /// </summary>
+    public void SetFilled(int filled, int max)
     {
-        if (meter != null)
-        {
-            meter.OnValueChanged += Refresh;
-            Refresh(meter.value, meter.maxValue);
-        }
-    }
+        if (segments == null) return;
 
-    void OnDestroy()
-    {
-        if (meter != null)
-            meter.OnValueChanged -= Refresh;
-    }
+        int n = segments.Length;
+        int clamped = Mathf.Clamp(filled, 0, n);
 
-    private void Refresh(int value, int max)
-    {
-        if (segments == null || segments.Length == 0) return;
-
-        int filled = Mathf.Clamp(value / 10, 0, segments.Length);
-
-        for (int i = 0; i < segments.Length; i++)
+        for (int i = 0; i < n; i++)
         {
             if (segments[i] == null) continue;
-            segments[i].color = (i < filled) ? onColor : offColor;
+            segments[i].color = (i < clamped) ? filledColor : emptyColor;
         }
     }
 }
